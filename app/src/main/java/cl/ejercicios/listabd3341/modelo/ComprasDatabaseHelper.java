@@ -3,6 +3,7 @@ package cl.ejercicios.listabd3341.modelo;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -50,6 +51,7 @@ public class ComprasDatabaseHelper extends SQLiteOpenHelper {
             valores.put("ESTADO",0);
         }
         db.insert("PRODUCTOS",null,valores);
+        db.close();
     }
 
     public List<Producto> listaProductos()
@@ -78,4 +80,55 @@ public class ComprasDatabaseHelper extends SQLiteOpenHelper {
 
         return productos;
     }
+    public Producto getProducto(String nombre)
+    {
+        Producto p;
+        SQLiteDatabase db=getReadableDatabase();
+        String sqlTxt="select NOMBRE, CANTIDAD, UNIDAD, ESTADO "
+                +"FROM PRODUCTOS WHERE NOMBRE=? ";
+        String[] argumentos=new String[]{nombre};
+        try{
+            Cursor cursor=db.rawQuery(sqlTxt,argumentos);
+            cursor.moveToFirst();
+            boolean estado=false;
+            if(cursor.getInt(3)==1) estado=true;
+            p=new Producto(cursor.getString(0),
+                    cursor.getInt(1), cursor.getString(2),
+                    estado);
+        }catch (SQLException ex)
+        {
+            p=null;
+        }
+        return p;
+    }
+    public String cambiarEstado(Producto p)
+    {
+        int estadoInt;
+        //p ya viene con el estado cambiado,
+        //solo hay que cambiarlo en la BD.
+        if(p.isEstado()) estadoInt=1;
+        else estadoInt=0;
+        String sqlTxt="UPDATE PRODUCTOS SET ESTADO=? "
+                +"WHERE NOMBRE=? ";
+        Object[] argumentos=new Object[]{estadoInt,p.getNombre()};
+        try{
+            getWritableDatabase().execSQL(sqlTxt,argumentos);
+            return "Se cambió correctamente el estado";
+        }catch (SQLException ex){
+            return "ERROR: No se pudo cambiar el estado";
+        }
+    }
+    public String eliminarComprados()
+    {
+        String sqlTxt="DELETE FROM PRODUCTOS WHERE ESTADO=0";
+        try{
+            getWritableDatabase().execSQL(sqlTxt);
+            return "Se eliminaron todos los productos comprados";
+        }
+        catch (SQLException ex)
+        {
+            return "ERROR: No se pueden eliminar los productos";
+        }
+    }
+
 }
