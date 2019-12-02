@@ -16,6 +16,7 @@ public class ComprasDatabaseHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION=1;
 
     public ComprasDatabaseHelper(Context context) {
+
         super(context, DB_NAME, null, DB_VERSION);
     }
 
