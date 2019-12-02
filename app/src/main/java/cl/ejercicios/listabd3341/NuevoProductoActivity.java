@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import cl.ejercicios.listabd3341.modelo.ComprasDatabaseHelper;
 import cl.ejercicios.listabd3341.modelo.ListDeCompras;
 import cl.ejercicios.listabd3341.modelo.Producto;
 
@@ -41,8 +42,14 @@ public class NuevoProductoActivity extends AppCompatActivity {
                 unidad=unidadNueva;
             }
             Producto producto=new Producto(nombre,cantidad,unidad);
+            ComprasDatabaseHelper helper=new ComprasDatabaseHelper(this);
+            helper.ingresarProducto(producto);
+
+            /*
             ListDeCompras listaDeCompras=ListDeCompras.getInstancia();
             listaDeCompras.agregarProducto(producto);
+            */
+
             finish();
         }
         else {

@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import cl.ejercicios.listabd3341.modelo.ComprasDatabaseHelper;
 import cl.ejercicios.listabd3341.modelo.ListDeCompras;
 import cl.ejercicios.listabd3341.modelo.Producto;
 
@@ -15,6 +17,7 @@ public class DetallesActivity extends AppCompatActivity {
 
     private Producto producto;
     private Intent intent;
+    private ComprasDatabaseHelper helper=new ComprasDatabaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +26,17 @@ public class DetallesActivity extends AppCompatActivity {
 
         //Obtener el producto
         intent=getIntent();
+
+        //Leer el nombre del producto
+        String nombreProducto=(String) intent.getExtras().get("nombreProducto");
+
+        //Traer el producto desde la base de datos
+        producto=helper.getProducto(nombreProducto);
+
+        /*
         int id=(Integer) intent.getExtras().get("idProducto");
         producto= ListDeCompras.getInstancia().getProducto(id);
+        */
 
         //Mostrar la información del producto
         TextView txtNombre=(TextView)findViewById(R.id.txtNombre);
@@ -50,6 +62,10 @@ public class DetallesActivity extends AppCompatActivity {
     public void cambiarEstado(View view)
     {
         producto.setEstado(!producto.isEstado());
+        //Actualizar el estado en la base de datos
+        String mensaje=helper.cambiarEstado(producto);
+        Toast.makeText(this,mensaje,Toast.LENGTH_SHORT).show();
+
         setResult(RESULT_OK,intent);
         finish();
     }
